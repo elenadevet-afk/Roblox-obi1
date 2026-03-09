@@ -2,29 +2,34 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Game Builder v3.0</title>
+    <title>Game Builder v4.0 - Fixed Platforms</title>
     <style>
-        :root { --accent: #bc13fe; --bg: #0f0f0f; }
-        body { font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; height: 100vh; background: var(--bg); color: white; }
-        #settings { width: 420px; background: #1a1a1a; padding: 20px; overflow-y: auto; border-right: 2px solid var(--accent); }
-        .q-card { background: #252525; padding: 12px; border-radius: 10px; margin-bottom: 10px; border-left: 5px solid var(--accent); }
-        input { width: 100%; padding: 10px; margin: 5px 0; border-radius: 5px; border: 1px solid #444; background: #000; color: #00f7ff; box-sizing: border-box; }
-        #preview { flex-grow: 1; padding: 20px; background: #050505; display: flex; flex-direction: column; }
-        .frame-cont { flex-grow: 1; border: 2px solid #333; border-radius: 15px; overflow: hidden; background: #000; }
-        .btn-copy { background: var(--accent); color: white; padding: 15px; width: 100%; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; border: none; margin-top: 10px; box-shadow: 0 0 15px rgba(188,19,254,0.4); }
-        .btn-lang { float: right; background: #333; color: #fff; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; }
+        :root { --accent: #bc13fe; --bg: #121212; }
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; height: 100vh; background: var(--bg); color: white; overflow: hidden; }
+        #settings { width: 400px; background: #1e1e1e; padding: 20px; overflow-y: auto; border-right: 2px solid var(--accent); box-shadow: 5px 0 15px rgba(0,0,0,0.5); }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .q-card { background: #2a2a2a; padding: 12px; border-radius: 10px; margin-bottom: 10px; border-left: 5px solid var(--accent); }
+        input { width: 100%; padding: 10px; margin: 5px 0; border-radius: 5px; border: 1px solid #444; background: #000; color: #00f7ff; box-sizing: border-box; font-weight: bold; }
+        label { font-size: 12px; color: #888; text-transform: uppercase; }
+        #preview { flex-grow: 1; padding: 20px; background: #000; display: flex; flex-direction: column; }
+        .frame-cont { flex-grow: 1; border: 2px solid #333; border-radius: 15px; overflow: hidden; background: #111; position: relative; }
+        .btn-copy { background: var(--accent); color: white; padding: 18px; width: 100%; border-radius: 12px; font-size: 16px; font-weight: bold; cursor: pointer; border: none; margin-top: 15px; transition: 0.3s; }
+        .btn-copy:hover { background: #d047ff; transform: translateY(-2px); }
+        .btn-lang { background: #333; color: #fff; border: none; padding: 6px 12px; border-radius: 20px; cursor: pointer; font-size: 12px; }
     </style>
 </head>
 <body>
 
 <div id="settings">
-    <button class="btn-lang" onclick="toggleLang()">EN / RU</button>
-    <h2 id="t-title">Редактор Квеста</h2>
+    <div class="header">
+        <h2 id="t-title">Редактор Квеста</h2>
+        <button class="btn-lang" onclick="toggleLang()">EN / RU</button>
+    </div>
     
-    <label id="l-hero">Ссылка на PNG героя</label>
+    <label id="l-hero">Прямая ссылка на героя (PNG)</label>
     <input type="text" id="h-url" value="https://cdn-icons-png.flaticon.com/512/616/616430.png" oninput="update()">
     
-    <label id="l-color">Цвет (HEX)</label>
+    <label id="l-color">Цвет платформ</label>
     <input type="color" id="h-color" value="#bc13fe" oninput="update()">
 
     <h3 id="t-qs">Задания (14)</h3>
@@ -34,15 +39,18 @@
 </div>
 
 <div id="preview">
-    <h3 id="t-pre">Предпросмотр:</h3>
+    <div style="margin-bottom: 10px; display: flex; justify-content: space-between;">
+        <span id="t-pre">Предпросмотр (Live):</span>
+        <span style="color: #555; font-size: 12px;">v4.0 Fixed Layout</span>
+    </div>
     <div class="frame-cont" id="f-box"></div>
 </div>
 
 <script>
     let lang = 'ru';
     const txt = {
-        ru: { title: "Редактор", hero: "Герой (PNG)", color: "Цвет", qs: "Задания", pre: "Предпросмотр", copy: "КОПИРОВАТЬ ДЛЯ GENIALLY" },
-        en: { title: "Editor", hero: "Hero (PNG URL)", color: "Color", qs: "Questions", pre: "Preview", copy: "COPY FOR GENIALLY" }
+        ru: { title: "Редактор", hero: "Герой (PNG URL)", color: "Цвет платформ", qs: "Задания (14)", pre: "Предпросмотр", copy: "СКОПИРОВАТЬ ДЛЯ GENIALLY" },
+        en: { title: "Editor", hero: "Hero (PNG URL)", color: "Platform Color", qs: "Questions (14)", pre: "Live Preview", copy: "COPY FOR GENIALLY" }
     };
 
     let questions = [
@@ -89,9 +97,9 @@
         const col = document.getElementById('h-color').value;
         const qStr = JSON.stringify(questions);
         
-        // Код игры без лишних переносов
-        const game = `<iframe srcdoc='<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body,html{margin:0;padding:0;overflow:hidden;background:transparent;font-family:sans-serif}canvas{display:block;background:transparent}#ui{position:absolute;top:10px;left:10px;display:flex;gap:8px;z-index:10}.b{background:rgba(0,0,0,0.5);color:#fff;border:1px solid ${col};padding:5px 10px;border-radius:10px;font-size:12px;backdrop-filter:blur(5px)}#u{position:absolute;top:10px;right:10px;width:80px;height:40px;background:radial-gradient(ellipse,${col},#000);border-radius:50% 50% 40% 40%;border:1px solid #fff;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:bold;box-shadow:0 0 10px ${col};animation:a 3s infinite ease-in-out;font-size:12px}@keyframes a{0%,100%{transform:translateY(0)}50%{transform:translateY(5px)}}#q{position:absolute;top:30%;left:50%;transform:translate(-50%,-50%);background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.2);border-radius:20px;padding:20px;width:280px;color:#fff;text-align:center;backdrop-filter:blur(10px);box-shadow:0 5px 20px rgba(0,0,0,0.3)}.bt{background:rgba(255,255,255,0.1);border:1px solid ${col}88;color:#fff;width:100%;padding:10px;margin:5px 0;border-radius:10px;cursor:pointer;font-weight:bold}.bt:hover{background:${col}66}</style></head><body><div id="ui"><div class="b" id="h">❤️ ❤️ ❤️</div><div class="b" id="s">STEP: 1/14</div></div><div id="u"><span id="t">0s</span></div><div id="q"><div id="qt" style="font-size:18px;margin-bottom:15px"></div><div id="as"></div></div><canvas id="c"></canvas><script>const img=new Image();img.src="${h}";const cvs=document.getElementById("c"),ctx=cvs.getContext("2d"),tasks=${qStr};let cur=0,liv=3,sec=0,jT=1,sP={x:0,y:0},tP={x:0,y:0},act=true;setInterval(()=>{if(act){sec++;document.getElementById("t").innerText=sec+"s"}},1000);function rs(){cvs.width=window.innerWidth;cvs.height=window.innerHeight}window.onresize=rs;rs();const pls=[];for(let i=0;i<15;i++){pls.push({x:(cvs.width*0.05)+(i*(cvs.width*0.065)),y:(cvs.height*0.88)-(i*22)})}let hP={x:pls[0].x,y:pls[0].y};function dP(x,y,a){ctx.save();ctx.translate(x,y);ctx.fillStyle=a?"${col}":"rgba(150,150,150,0.2)";ctx.strokeStyle=a?"#fff":"rgba(255,255,255,0.1)";ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(35,-18);ctx.lineTo(70,0);ctx.lineTo(35,18);ctx.closePath();ctx.fill();ctx.stroke();ctx.restore()}function dH(x,y,t){const b=Math.sin(t*Math.PI)*40,w=45,h=55;if(img.complete)ctx.drawImage(img,x+12,y-b-h+10,w,h)}function u(){ctx.clearRect(0,0,cvs.width,cvs.height);pls.forEach((p,i)=>dP(p.x,p.y,i<=cur));if(jT<1){jT+=0.06;hP.x=sP.x+(tP.x-sP.x)*jT;hP.y=sP.y+(tP.y-sP.y)*jT;if(jT>=1){jT=1;if(cur<14){document.getElementById("q").style.display="block";uQ()}else{act=false;f()}}}dH(hP.x,hP.y,jT);requestAnimationFrame(u)}function uQ(){document.getElementById("s").innerText="STEP: "+(cur+1)+"/14";document.getElementById("qt").innerText=tasks[cur].q;const b=document.getElementById("as");b.innerHTML="";tasks[cur].a.forEach((t,i)=>{const btn=document.createElement("button");btn.className="bt";btn.innerText=t;btn.onclick=()=>{if(i===tasks[cur].c){sP={x:hP.x,y:hP.y};cur++;tP={x:pls[cur].x,y:pls[cur].y};jT=0;document.getElementById("q").style.display="none"}else{liv--;document.getElementById("h").innerText="❤️ ".repeat(liv);if(liv<=0){act=false;f()}else alert("Wrong!")}};b.appendChild(btn)})}function f(){const q=document.getElementById("q");q.style.display="block";const w=liv>0;q.innerHTML="<h2 style=\'color:"+(w?"#00f7ff":"#f44")+"\'>"+(w?"MISSION COMPLETE":"GAME OVER")+"</h2><p>Time: "+sec+"s</p><button class=\'bt\' onclick=\'location.reload()\'>RESTART</button>"}uQ();u();<\/script></body></html>' style='width:100%;height:600px;border:none;'></iframe>`;
-        return game.replace(/\s+/g, ' ').trim();
+        // ВАЖНО: Мы используем фиксированный шаг 60px по X и 22px по Y для лестницы
+        const game = `<iframe srcdoc='<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body,html{margin:0;padding:0;overflow:hidden;background:transparent;font-family:sans-serif;height:100vh;width:100vw}canvas{display:block;background:transparent}#ui{position:absolute;top:10px;left:10px;display:flex;gap:8px;z-index:50}.b{background:rgba(0,0,0,0.6);color:#fff;border:1px solid ${col};padding:6px 12px;border-radius:10px;font-size:12px;backdrop-filter:blur(5px);font-weight:bold}#u{position:absolute;top:10px;right:15px;width:80px;height:45px;background:radial-gradient(ellipse,${col},#000);border-radius:50% 50% 40% 40%;border:1px solid #fff;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:bold;box-shadow:0 0 15px ${col};animation:a 3s infinite ease-in-out;z-index:50}@keyframes a{0%,100%{transform:translateY(0)}50%{transform:translateY(8px)}}#q{position:absolute;top:35%;left:50%;transform:translate(-50%,-50%);background:rgba(10,10,10,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:24px;padding:25px;width:300px;color:#fff;text-align:center;backdrop-filter:blur(15px);box-shadow:0 10px 30px rgba(0,0,0,0.5);z-index:100}.bt{background:rgba(255,255,255,0.1);border:1px solid ${col}aa;color:#fff;width:100%;padding:12px;margin:6px 0;border-radius:12px;cursor:pointer;font-weight:bold;transition:0.2s}.bt:hover{background:${col}88}</style></head><body><div id="ui"><div class="b" id="h">❤️ ❤️ ❤️</div><div class="b" id="s">STEP: 1/14</div></div><div id="u"><span id="t">0s</span></div><div id="q"><div id="qt" style="font-size:19px;margin-bottom:15px;font-weight:bold"></div><div id="as"></div></div><canvas id="c"></canvas><script>const img=new Image();img.src="${h}";const cvs=document.getElementById("c"),ctx=cvs.getContext("2d"),tasks=${qStr};let cur=0,liv=3,sec=0,jT=1,sP={x:0,y:0},tP={x:0,y:0},act=true;setInterval(()=>{if(act){sec++;document.getElementById("t").innerText=sec+"s"}},1000);function rs(){cvs.width=window.innerWidth;cvs.height=window.innerHeight;genPls()}window.onresize=rs;let pls=[];function genPls(){pls=[];const startX=cvs.width*0.1;const startY=cvs.height*0.85;const stepX=Math.max(50,cvs.width/18);for(let i=0;i<15;i++){pls.push({x:startX+(i*stepX),y:startY-(i*24)})}}rs();let hP={x:pls[0].x,y:pls[0].y};function dP(x,y,a){ctx.save();ctx.translate(x,y);ctx.fillStyle=a?"${col}":"rgba(100,100,100,0.2)";ctx.strokeStyle=a?"#fff":"rgba(255,255,255,0.1)";ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(35,-18);ctx.lineTo(70,0);ctx.lineTo(35,18);ctx.closePath();ctx.fill();ctx.stroke();ctx.restore()}function dH(x,y,t){const b=Math.sin(t*Math.PI)*45,w=50,h=60;if(img.complete)ctx.drawImage(img,x+10,y-b-h+5,w,h)}function u(){ctx.clearRect(0,0,cvs.width,cvs.height);pls.forEach((p,i)=>dP(p.x,p.y,i<=cur));if(jT<1){jT+=0.05;hP.x=sP.x+(tP.x-sP.x)*jT;hP.y=sP.y+(tP.y-sP.y)*jT;if(jT>=1){jT=1;if(cur<14){document.getElementById("q").style.display="block";uQ()}else{act=false;f()}}}dH(hP.x,hP.y,jT);requestAnimationFrame(u)}function uQ(){document.getElementById("s").innerText="STEP: "+(cur+1)+"/14";document.getElementById("qt").innerText=tasks[cur].q;const b=document.getElementById("as");b.innerHTML="";tasks[cur].a.forEach((t,i)=>{const btn=document.createElement("button");btn.className="bt";btn.innerText=t;btn.onclick=()=>{if(i===tasks[cur].c){sP={x:hP.x,y:hP.y};cur++;tP={x:pls[cur].x,y:pls[cur].y};jT=0;document.getElementById("q").style.display="none"}else{liv--;document.getElementById("h").innerText="❤️ ".repeat(liv);if(liv<=0){act=false;f()}else alert("Wrong!")}};b.appendChild(btn)})}function f(){const q=document.getElementById("q");q.style.display="block";const w=liv>0;q.innerHTML="<h2 style=\'color:"+(w?"#00f7ff":"#f44")+"\'>"+(w?"EXCELLENT!":"GAME OVER")+"</h2><p>Time: "+sec+"s</p><button class=\'bt\' onclick=\'location.reload()\'>RESTART</button>"}uQ();u();<\/script></body></html>' style='width:100%;height:600px;border:none;'></iframe>`;
+        return game.trim();
     }
 
     function update() {
@@ -106,7 +114,7 @@
         el.select();
         document.execCommand('copy');
         document.body.removeChild(el);
-        alert(lang === 'ru' ? "Код скопирован!" : "Code copied!");
+        alert(lang === 'ru' ? "Код скопирован! Вставляйте в Genially." : "Code copied! Paste it into Genially.");
     }
 
     render();
