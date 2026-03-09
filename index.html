@@ -3,77 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Game Editor for Genially</title>
+    <title>Ultimate Game Editor 2026</title>
     <style>
-        :root { --p-color: #bc13fe; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; display: flex; height: 100vh; background: #1a1a1a; color: white; }
+        :root { --accent: #bc13fe; --bg: #121212; --panel: #1e1e1e; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; margin: 0; display: flex; height: 100vh; background: var(--bg); color: white; overflow: hidden; }
         
-        /* Панель настроек */
-        #settings { width: 400px; background: #252525; padding: 20px; overflow-y: auto; border-right: 2px solid #333; }
-        h2 { border-bottom: 2px solid var(--p-color); padding-bottom: 10px; display: flex; justify-content: space-between; }
+        /* Sidebar */
+        #settings { width: 450px; background: var(--panel); padding: 25px; overflow-y: auto; border-right: 1px solid #333; box-shadow: 5px 0 15px rgba(0,0,0,0.3); }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid var(--accent); padding-bottom: 10px; }
         
-        .field { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-size: 14px; color: #aaa; }
-        input, select, textarea { width: 100%; padding: 8px; border-radius: 5px; border: 1px solid #444; background: #111; color: white; box-sizing: border-box; }
+        .field { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-size: 13px; color: #bbb; text-transform: uppercase; letter-spacing: 1px; }
+        input, select { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #333; background: #000; color: #00f7ff; font-weight: bold; }
         
-        .q-item { background: #333; padding: 10px; border-radius: 8px; margin-bottom: 10px; border-left: 4px solid var(--p-color); }
+        .q-card { background: #2a2a2a; padding: 15px; border-radius: 12px; margin-bottom: 15px; position: relative; border: 1px solid #333; }
+        .q-card:hover { border-color: var(--accent); }
+        .q-num { position: absolute; top: -10px; left: 10px; background: var(--accent); color: white; padding: 2px 8px; border-radius: 5px; font-size: 12px; }
         
-        /* Превью */
-        #preview { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #111; position: relative; }
-        .iframe-container { width: 100%; height: 500px; border: 1px dashed #555; background: #000; }
+        /* Main Preview */
+        #main { flex-grow: 1; display: flex; flex-direction: column; padding: 20px; gap: 20px; }
+        #preview-wrap { flex-grow: 1; background: #000; border-radius: 15px; overflow: hidden; border: 2px solid #333; position: relative; }
         
-        button { cursor: pointer; padding: 10px 15px; border-radius: 5px; border: none; font-weight: bold; transition: 0.3s; }
-        .btn-main { background: var(--p-color); color: white; width: 100%; margin-top: 20px; }
-        .btn-lang { background: #444; color: white; font-size: 12px; padding: 5px 10px; }
-        .btn-add { background: #28a745; color: white; width: 100%; margin-top: 10px; }
+        /* Buttons */
+        button { cursor: pointer; border: none; transition: 0.3s; font-weight: bold; }
+        .btn-lang { background: #333; color: white; padding: 5px 15px; border-radius: 20px; font-size: 12px; border: 1px solid #444; }
+        .btn-lang:hover { background: var(--accent); }
+        .btn-copy { background: var(--accent); color: white; padding: 20px; width: 100%; border-radius: 12px; font-size: 18px; box-shadow: 0 5px 15px rgba(188, 19, 254, 0.3); margin-top: 10px; }
+        .btn-copy:active { transform: scale(0.98); }
         
-        #copy-area { position: fixed; bottom: 20px; right: 20px; width: 300px; display: none; background: #333; padding: 15px; border-radius: 10px; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
+        .success-msg { position: fixed; top: 20px; right: 20px; background: #00f7ff; color: #000; padding: 15px 25px; border-radius: 10px; font-weight: bold; display: none; z-index: 1000; animation: slideIn 0.3s ease-out; }
+        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
     </style>
 </head>
 <body>
 
-<div id="settings">
-    <h2>
-        <span id="t-title">Редактор Игры</span>
-        <button class="btn-lang" onclick="toggleLang()">EN / RU</button>
-    </h2>
+<div id="success" class="success-msg">✅ CODE COPIED! Ready for Genially</div>
 
-    <div class="field">
-        <label id="l-hero">Ссылка на персонажа (PNG)</label>
-        <input type="text" id="hero-url" value="https://cdn-icons-png.flaticon.com/512/616/616430.png" oninput="updatePreview()">
+<aside id="settings">
+    <div class="header">
+        <h2 id="t-title">EDITOR</h2>
+        <button class="btn-lang" onclick="toggleLang()">RU / EN</button>
     </div>
 
     <div class="field">
-        <label id="l-color">Цвет платформ</label>
-        <input type="color" id="plat-color" value="#bc13fe" oninput="updatePreview()">
+        <label id="l-hero">Character Image URL (PNG)</label>
+        <input type="text" id="hero-url" value="https://cdn-icons-png.flaticon.com/512/616/616430.png" onchange="refreshPreview()">
     </div>
 
     <div class="field">
-        <label id="l-feedback">Обратная связь (Win)</label>
-        <input type="text" id="fb-win" value="EXCELLENT!" oninput="updatePreview()">
+        <label id="l-color">Platform Color</label>
+        <input type="color" id="plat-color" value="#bc13fe" onchange="refreshPreview()">
     </div>
 
-    <h3 id="t-questions">Задания (14)</h3>
-    <div id="questions-list"></div>
+    <div class="field">
+        <label id="l-win">Win Message (English)</label>
+        <input type="text" id="win-msg" value="EXCELLENT! MISSION COMPLETE" onchange="refreshPreview()">
+    </div>
 
-    <button class="btn-main" onclick="generateCode()" id="t-generate">Копировать код для Genially</button>
-</div>
+    <h3 id="t-q-title">QUESTIONS (14)</h3>
+    <div id="q-list"></div>
 
-<div id="preview">
-    <h3 id="t-preview">Предпросмотр (Live Preview)</h3>
-    <div class="iframe-container" id="iframe-box"></div>
-</div>
+    <button class="btn-copy" onclick="copyToGenially()" id="t-btn-copy">COPY FOR GENIALLY</button>
+</aside>
 
-<div id="copy-area">
-    <p id="t-ready" style="font-size: 14px;">Код скопирован! Вставь его в Genially через 'Insert' -> 'Others'</p>
-    <textarea id="final-code" rows="5" style="font-size: 10px;"></textarea>
-</div>
+<main id="main">
+    <div id="preview-wrap">
+        <iframe id="game-frame" style="width:100%; height:100%; border:none; background: transparent;"></iframe>
+    </div>
+</main>
 
 <script>
-    let currentLang = 'ru';
-    const dict = {
-        ru: { title: "Редактор", hero: "Ссылка на персонажа (PNG)", color: "Цвет платформ", fb: "Победная фраза", questions: "Задания", gen: "Создать код для Genially", preview: "Предпросмотр", ready: "Код скопирован!", q: "Вопрос", a: "Ответ" },
-        en: { title: "Editor", hero: "Character URL (PNG)", color: "Platform Color", fb: "Win Feedback", questions: "Questions", gen: "Copy code for Genially", preview: "Live Preview", ready: "Code copied!", q: "Question", a: "Answer" }
+    let lang = 'ru';
+    const ui = {
+        ru: { title: "РЕДАКТОР", hero: "Ссылка на героя (PNG)", color: "Цвет платформ", win: "Фраза при победе", q_title: "ВОПРОСЫ (14)", copy: "КОПИРОВАТЬ ДЛЯ GENIALLY", copied: "КОД СКОПИРОВАН!" },
+        en: { title: "EDITOR", hero: "Character Image (PNG)", color: "Platform Color", win: "Win Message", q_title: "QUESTIONS (14)", copy: "COPY FOR GENIALLY", copied: "CODE COPIED!" }
     };
 
     let questions = [
@@ -94,91 +97,103 @@
     ];
 
     function toggleLang() {
-        currentLang = currentLang === 'ru' ? 'en' : 'ru';
-        document.getElementById('t-title').innerText = dict[currentLang].title;
-        document.getElementById('l-hero').innerText = dict[currentLang].hero;
-        document.getElementById('l-color').innerText = dict[currentLang].color;
-        document.getElementById('l-feedback').innerText = dict[currentLang].fb;
-        document.getElementById('t-questions').innerText = dict[currentLang].questions;
-        document.getElementById('t-generate').innerText = dict[currentLang].gen;
-        document.getElementById('t-preview').innerText = dict[currentLang].preview;
-        document.getElementById('t-ready').innerText = dict[currentLang].ready;
+        lang = lang === 'ru' ? 'en' : 'ru';
+        updateUI();
+    }
+
+    function updateUI() {
+        document.getElementById('t-title').innerText = ui[lang].title;
+        document.getElementById('l-hero').innerText = ui[lang].hero;
+        document.getElementById('l-color').innerText = ui[lang].color;
+        document.getElementById('l-win').innerText = ui[lang].win;
+        document.getElementById('t-q-title').innerText = ui[lang].q_title;
+        document.getElementById('t-btn-copy').innerText = ui[lang].copy;
         renderQuestions();
     }
 
     function renderQuestions() {
-        const list = document.getElementById('questions-list');
+        const list = document.getElementById('q-list');
         list.innerHTML = '';
-        questions.forEach((item, i) => {
-            const div = document.createElement('div');
-            div.className = 'q-item';
-            div.innerHTML = `
-                <input type="text" value="${item.q}" oninput="questions[${i}].q = this.value; updatePreview()">
-                <div style="display:flex; gap:5px; margin-top:5px;">
-                    <input type="text" value="${item.a[0]}" oninput="questions[${i}].a[0] = this.value; updatePreview()">
-                    <input type="text" value="${item.a[1]}" oninput="questions[${i}].a[1] = this.value; updatePreview()">
-                    <input type="text" value="${item.a[2]}" oninput="questions[${i}].a[2] = this.value; updatePreview()">
+        questions.forEach((q, i) => {
+            const card = document.createElement('div');
+            card.className = 'q-card';
+            card.innerHTML = `
+                <div class="q-num">${i+1}</div>
+                <input type="text" value="${q.q}" onchange="questions[${i}].q=this.value; refreshPreview()" style="margin-bottom:8px">
+                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:5px">
+                    <input type="text" value="${q.a[0]}" onchange="questions[${i}].a[0]=this.value; refreshPreview()">
+                    <input type="text" value="${q.a[1]}" onchange="questions[${i}].a[1]=this.value; refreshPreview()">
+                    <input type="text" value="${q.a[2]}" onchange="questions[${i}].a[2]=this.value; refreshPreview()">
                 </div>
             `;
-            list.appendChild(div);
+            list.appendChild(card);
         });
     }
 
-    function updatePreview() {
-        const color = document.getElementById('plat-color').value;
-        const hero = document.getElementById('hero-url').value;
-        const fbWin = document.getElementById('fb-win').value;
+    function buildGameCode() {
+        const char = document.getElementById('hero-url').value;
+        const col = document.getElementById('plat-color').value;
+        const msg = document.getElementById('win-msg').value;
         
-        const gameCode = `
+        // Генерируем чистый код игры
+        return `
         <iframe srcdoc='<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
-        body, html { margin: 0; padding: 0; overflow: hidden; background: transparent; font-family: "Segoe UI", sans-serif; height: 100vh; width: 100vw; }
-        canvas { display: block; background: transparent; }
-        #ui { position: absolute; top: 15px; left: 15px; display: flex; gap: 10px; z-index: 10; pointer-events: none; }
-        .badge { background: rgba(0,0,0,0.4); color: white; border: 1px solid ${color}; padding: 8px 15px; border-radius: 12px; font-weight: bold; font-size: 14px; backdrop-filter: blur(5px); }
-        #ufo-timer { position: absolute; top: 10px; right: 20px; width: 90px; height: 50px; background: radial-gradient(ellipse at center, ${color} 0%, rgba(0,0,0,0.6) 85%); border-radius: 50% 50% 40% 40%; border: 1px solid rgba(255,255,255,0.5); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: bold; box-shadow: 0 0 15px ${color}; animation: float 3s infinite ease-in-out; z-index: 100; font-size: 14px; }
-        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(8px); } }
-        #quiz { position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%); background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 24px; padding: 30px; width: 320px; color: white; text-align: center; z-index: 20; backdrop-filter: blur(10px); box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); }
-        .btn { background: rgba(255, 255, 255, 0.08); border: 1px solid ${color}66; color: white; width: 100%; padding: 12px; margin: 8px 0; border-radius: 14px; cursor: pointer; font-weight: bold; font-size: 15px; transition: 0.3s; }
-        .btn:hover { background: ${color}99; border-color: #fff; }
+        body,html{margin:0;padding:0;overflow:hidden;background:transparent;font-family:sans-serif;height:100vh;width:100vw}
+        canvas{display:block;background:transparent}
+        #ui{position:absolute;top:15px;left:15px;display:flex;gap:10px;z-index:10;pointer-events:none}
+        .badge{background:rgba(0,0,0,0.4);color:white;border:1px solid ${col};padding:8px 15px;border-radius:12px;font-weight:bold;font-size:14px;backdrop-filter:blur(5px)}
+        #ufo{position:absolute;top:10px;right:20px;width:90px;height:50px;background:radial-gradient(ellipse at center,${col} 0%,rgba(0,0,0,0.6) 85%);border-radius:50% 50% 40% 40%;border:1px solid rgba(255,255,255,0.5);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:bold;box-shadow:0 0 15px ${col};animation:f 3s infinite ease-in-out;z-index:100;font-size:14px}
+        @keyframes f{0%,100%{transform:translateY(0)}50%{transform:translateY(8px)}}
+        #quiz{position:absolute;top:35%;left:50%;transform:translate(-50%,-50%);background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);border-radius:24px;padding:30px;width:320px;color:white;text-align:center;z-index:20;backdrop-filter:blur(10px);box-shadow:0 4px 30px rgba(0,0,0,0.1)}
+        .btn{background:rgba(255,255,255,0.08);border:1px solid ${col}66;color:white;width:100%;padding:12px;margin:8px 0;border-radius:14px;cursor:pointer;font-weight:bold;font-size:15px;transition:0.3s}
+        .btn:hover{background:${col}99;border-color:#fff}
         </style></head><body>
         <div id="ui"><div class="badge" id="hp">❤️ ❤️ ❤️</div><div class="badge" id="st">STEP: 1/14</div></div>
-        <div id="ufo-timer"><span id="tm-val">0s</span></div>
-        <div id="quiz"><div id="q-text" style="font-size:20px; font-weight:bold; margin-bottom:20px; text-shadow: 1px 1px 10px rgba(0,0,0,0.5);"></div><div id="ans-box"></div></div>
-        <canvas id="gameCanvas"></canvas>
+        <div id="ufo"><span id="tm">0s</span></div>
+        <div id="quiz"><div id="q-t" style="font-size:20px;font-weight:bold;margin-bottom:20px"></div><div id="ans"></div></div>
+        <canvas id="c"></canvas>
         <script>
-        const heroImg = new Image(); heroImg.src = "${hero}";
-        const canvas = document.getElementById("gameCanvas"); const ctx = canvas.getContext("2d");
-        const tasks = ${JSON.stringify(questions)};
-        let cur = 0, lives = 3, mistakes = 0, jumpT = 1, startPos = {x: 0, y: 0}, targetPos = {x: 0, y: 0}, seconds = 0, timerActive = true;
-        setInterval(() => { if(timerActive) { seconds++; document.getElementById("tm-val").innerText = seconds + "s"; } }, 1000);
-        function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-        window.onresize = resize; resize();
-        const plats = []; const totalSteps = 15; const pWidth = 85; const pHeight = 45;
-        for(let i=0; i < totalSteps; i++) { plats.push({ x: (canvas.width * 0.05) + (i * 68), y: (canvas.height * 0.9) - (i * 24) }); }
-        let heroPos = { x: plats[0].x, y: plats[0].y };
-        function drawPlatform(x, y, active) { ctx.save(); ctx.translate(x, y); ctx.fillStyle = active ? "${color}" : "rgba(180, 180, 180, 0.2)"; ctx.strokeStyle = active ? "#fff" : "rgba(255, 255, 255, 0.1)"; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(pWidth/2, -pHeight/2); ctx.lineTo(pWidth, 0); ctx.lineTo(pWidth/2, pHeight/2); ctx.closePath(); ctx.fill(); ctx.stroke(); ctx.restore(); }
-        function drawHero(x, y, t) { const bounce = Math.sin(t * Math.PI) * 50; const imgW = 50, imgH = 60; const px = x + pWidth/2 - imgW/2, py = y - bounce - imgH + 10; if (heroImg.complete) ctx.drawImage(heroImg, px, py, imgW, imgH); }
-        function update() { ctx.clearRect(0, 0, canvas.width, canvas.height); plats.forEach((p, i) => drawPlatform(p.x, p.y, i <= cur)); if (jumpT < 1) { jumpT += 0.05; heroPos.x = startPos.x + (targetPos.x - startPos.x) * jumpT; heroPos.y = startPos.y + (targetPos.y - startPos.y) * jumpT; if (jumpT >= 1) { jumpT = 1; if (cur < 14) { document.getElementById("quiz").style.display = "block"; updateQuiz(); } else { timerActive = false; showFinal(); } } } drawHero(heroPos.x, heroPos.y, jumpT); requestAnimationFrame(update); }
-        function updateQuiz() { document.getElementById("st").innerText = "STEP: " + (cur+1) + "/14"; document.getElementById("q-text").innerText = tasks[cur].q; const box = document.getElementById("ans-box"); box.innerHTML = ""; tasks[cur].a.forEach((t, i) => { const b = document.createElement("button"); b.className = "btn"; b.innerText = t; b.onclick = () => { if(i === tasks[cur].c) { startPos = { x: heroPos.x, y: heroPos.y }; cur++; targetPos = { x: plats[cur].x, y: plats[cur].y }; jumpT = 0; document.getElementById("quiz").style.display = "none"; } else { lives--; mistakes++; document.getElementById("hp").innerText = "❤️ ".repeat(lives) + "🖤 ".repeat(3-lives); if(lives <= 0) { timerActive = false; showFinal(); } else alert("Wrong!"); } }; box.appendChild(b); }); }
-        function showFinal() { const q = document.getElementById("quiz"); q.style.display = "block"; const isWin = lives > 0; q.innerHTML = "<h2 style=\'color:" + (isWin ? "#00f7ff" : "#ff4d4d") + "\'>" + (isWin ? "${fbWin}" : "GAME OVER") + "</h2><p>Time: " + seconds + "s</p><button class=\'btn\' onclick=\'location.reload()\'>RESTART</button>"; }
-        updateQuiz(); update();
-        <\/script></body></html>' style='width: 100%; height: 600px; border: none;'></iframe>`;
-        
-        document.getElementById('iframe-box').innerHTML = gameCode;
-        return gameCode;
+        const hImg=new Image();hImg.src="${char}";
+        const cvs=document.getElementById("c"),ctx=cvs.getContext("2d"),tasks=${JSON.stringify(questions)};
+        let cur=0,lives=3,miss=0,jT=1,sP={x:0,y:0},tP={x:0,y:0},sec=0,act=true;
+        setInterval(()=>{if(act){sec++;document.getElementById("tm").innerText=sec+"s"}},1000);
+        function res(){cvs.width=window.innerWidth;cvs.height=window.innerHeight}
+        window.onresize=res;res();
+        const pls=[];for(let i=0;i<15;i++){pls.push({x:(cvs.width*0.05)+(i*68),y:(cvs.height*0.9)-(i*24)})}
+        let hP={x:pls[0].x,y:pls[0].y};
+        function dPl(x,y,a){ctx.save();ctx.translate(x,y);ctx.fillStyle=a?"${col}":"rgba(180,180,180,0.2)";ctx.strokeStyle=a?"#fff":"rgba(255,255,255,0.1)";ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(42,-22);ctx.lineTo(84,0);ctx.lineTo(42,22);ctx.closePath();ctx.fill();ctx.stroke();ctx.restore()}
+        function dH(x,y,t){const b=Math.sin(t*Math.PI)*50,w=50,h=60;if(hImg.complete)ctx.drawImage(hImg,x+17,y-b-h+10,w,h)}
+        function upd(){ctx.clearRect(0,0,cvs.width,cvs.height);pls.forEach((p,i)=>dPl(p.x,p.y,i<=cur));if(jT<1){jT+=0.05;hP.x=sP.x+(tP.x-sP.x)*jT;hP.y=sP.y+(tP.y-sP.y)*jT;if(jT>=1){jT=1;if(cur<14){document.getElementById("quiz").style.display="block";uQ()}else{act=false;fin()}}}dH(hP.x,hP.y,jT);requestAnimationFrame(upd)}
+        function uQ(){document.getElementById("st").innerText="STEP: "+(cur+1)+"/14";document.getElementById("q-t").innerText=tasks[cur].q;const b=document.getElementById("ans");b.innerHTML="";tasks[cur].a.forEach((t,i)=>{const btn=document.createElement("button");btn.className="btn";btn.innerText=t;btn.onclick=()=>{if(i===tasks[cur].c){sP={x:hP.x,y:hP.y};cur++;tP={x:pls[cur].x,y:pls[cur].y};jT=0;document.getElementById("quiz").style.display="none"}else{lives--;miss++;document.getElementById("hp").innerText="❤️ ".repeat(lives)+"🖤 ".repeat(3-lives);if(lives<=0){act=false;fin()}else alert("Wrong!")}}}) ;b.appendChild(btn)})}
+        function fin(){const q=document.getElementById("quiz");q.style.display="block";const w=lives>0;q.innerHTML="<h2 style=\'color:"+(w?"#00f7ff":"#ff4d4d")+"\'>"+(w?"${msg}":"GAME OVER")+"</h2><p>Time: "+sec+"s</p><button class=\'btn\' onclick=\'location.reload()\'>RESTART</button>"}
+        uQ();upd();
+        <\/script></body></html>' style='width:100%;height:600px;border:none;'></iframe>`.replace(/\n/g, '').trim();
     }
 
-    function generateCode() {
-        const code = updatePreview();
-        document.getElementById('final-code').value = code;
-        document.getElementById('copy-area').style.display = 'block';
-        document.getElementById('final-code').select();
+    function refreshPreview() {
+        const frame = document.getElementById('game-frame');
+        frame.srcdoc = ''; // Очистка
+        setTimeout(() => {
+            frame.srcdoc = buildGameCode().match(/srcdoc='([^']*)'/)[1];
+        }, 50);
+    }
+
+    function copyToGenially() {
+        const code = buildGameCode();
+        const el = document.createElement('textarea');
+        el.value = code;
+        document.body.appendChild(el);
+        el.select();
         document.execCommand('copy');
-        setTimeout(() => { document.getElementById('copy-area').style.display = 'none'; }, 5000);
+        document.body.removeChild(el);
+        
+        const s = document.getElementById('success');
+        s.style.display = 'block';
+        setTimeout(() => s.style.display = 'none', 3000);
     }
 
-    renderQuestions();
-    updatePreview();
+    updateUI();
+    refreshPreview();
 </script>
 
 </body>
